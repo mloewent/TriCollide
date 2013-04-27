@@ -22,6 +22,7 @@ var GAMESCREEN = STG_HEIGHT - HEADERHEIGHT - FOOTERHEIGHT;
 var NUMLANES = 5;
 var LANEHEIGHT = 6;
 var HP_W = 341;
+var HP_MAX = 10;
 
 var RIGHT = 1;
 var LEFT = -1;
@@ -247,10 +248,10 @@ window.onload = function() {
       healthBar.y = 10;
       game.rootScene.addChild(healthBar);
       
-      var healthMask = new Sprite(HP_W/10, HEADERHEIGHT);
+      var healthMask = new Sprite(HP_W, HEADERHEIGHT);
       healthMask.image = game.assets['healthMask.png'];
-      healthMask.scale(-3, 1);
-      healthMask.x = 10 + HP_W - .1 * HP_W;
+      healthMask.scale(0, 1);
+      healthMask.x = 10 + HP_W;
       healthMask.y = 10;
       healthMask.opacity = 0.65;
       game.rootScene.addChild(healthMask);
