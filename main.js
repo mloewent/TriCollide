@@ -141,7 +141,8 @@ Triangle = Class.create(Sprite, {
     initialize: function(id, laneNum, x, direction) {
          Sprite.call(this, triWidth, triHeight);
          this.image = game.assets['tri1.png'];
-         this.chime= game.assets['chime' + 1 + '.wav'];
+         this.explosion = game.assets['explosion.mp3'];
+         this.chime = game.assets['chime' + id + '.wav'];
 		 this.scale(direction, 1);
          this.x = x;
          this.lane = laneNum;
@@ -190,12 +191,13 @@ Triangle = Class.create(Sprite, {
 
                     // If they're the same color
                     if (this.id !== triangleList[triangleNdx].id) {
-                        //this.chime.play();
+                        this.explosion.play();
                         health--;
                     // If they're the same color
                     } else {
                         if (health < HP_MAX) {
                            health++;
+                           this.chime.play();
                         } 
                     }
 
@@ -232,7 +234,8 @@ window.onload = function() {
     //Any resources not preloaded will not appear
 
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
-        'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png');
+        'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
+        'chime0.wav', 'chime2.wav', 'explosion.mp3');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
