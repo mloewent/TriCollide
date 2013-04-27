@@ -4,18 +4,17 @@ var moveSpeed = 4;
 var health = 5;
 var stgWidth = 1024;
 var stgHeight = 768;
-var triWidth = 16;
-var triHeight = 16;
+var triWidth = 100
+var triHeight = 100;
 
 
 //02 Triangle Class
 Triangle = Class.create(Sprite, {
     initialize: function() {
          Sprite.call(this, triWidth, triHeight);
-         this.image = game.assets['icon0.png'];
+         this.image = game.assets['tri1.png'];
          this.x = stgWidth/2;
          this.y = stgHeight/2;
-         this.frame = 43;
         //03 Bind Keys
         
         //04 Mouse Variables
@@ -34,7 +33,7 @@ window.onload = function() {
     game = new Game(stgWidth, stgHeight);
     //Preload images
     //Any resources not preloaded will not appear
-    game.preload('icon0.png', 'diamond-sheet.png', 'bg.png');
+    game.preload('tri1.png', 'diamond-sheet.png', 'bg.png');
 
     game.onload = function() { //Prepares the game
         //01 Add Background
@@ -54,8 +53,5 @@ window.onload = function() {
         });
 
     }
-    var sound = new Howl({
-       urls: ['nyan.ogg']
-    }).play();
     game.start(); //Begin the game
 }
