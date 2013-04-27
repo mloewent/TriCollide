@@ -221,12 +221,9 @@ window.onload = function() {
     game = new Game(STG_WIDTH, STG_HEIGHT);
     //Preload images
     //Any resources not preloaded will not appear
-<<<<<<< HEAD
-    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 'healthBar.png', 'healthMask.png');
-=======
+
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
-        'powerup.png', 'exlposions.png');
->>>>>>> 6575804223ac789d53cda5d660ce67e56fdb9505
+        'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
