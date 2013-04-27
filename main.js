@@ -12,6 +12,7 @@ var HEADERHEIGHT = 50; //The health bar block
 var GAMESCREEN = STG_HEIGHT - HEADERHEIGHT - FOOTERHEIGHT;
 var NUMLANES = 5;
 var LANEHEIGHT = 6;
+var HP_W = 341;
 
 var GREEN = 0;
 var BLUE = 1;
@@ -140,7 +141,7 @@ window.onload = function() {
     game = new Game(STG_WIDTH, STG_HEIGHT);
     //Preload images
     //Any resources not preloaded will not appear
-    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav');
+    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 'healthBar.png', 'healthMask.png');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
@@ -157,17 +158,27 @@ window.onload = function() {
 			game.rootScene.addChild(wire);
 		}
 		
-		//Health label
-        
-		healthLabel.color = "white";
-		healthLabel.font = "48px monospace";
-		game.rootScene.addChild(healthLabel);
+		//Health Bar and Mask
+      
+		var healthBar = new Sprite(HP_W, HEADERHEIGHT);
+      healthBar.image = game.assets['healthBar.png'];
+      healthBar.x = 10;
+      healthBar.y = 10;
+      game.rootScene.addChild(healthBar);
+      
+      var healthMask = new Sprite(HP_W/10, HEADERHEIGHT);
+      healthMask.image = game.assets['healthMask.png'];
+      healthMask.scale(-3, 1);
+      healthMask.x = 10 + HP_W - .1 * HP_W;
+      healthMask.y = 10;
+      healthMask.opacity = 0.65;
+      game.rootScene.addChild(healthMask);
 		
         //Game update
         game.rootScene.addEventListener('enterframe', function() {
             triSpawnTimer += frameTime;
 			time++;
-            healthLabel.text = "Health" + health;
+            //healthMask.scale(-10-health, 1);
 			if (triSpawnTimer > 1 / SPAWN_RATE) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				
