@@ -6,8 +6,8 @@ var stgWidth = 320;
 var stgHeight = 320;
 
 
-//02 Player Class
-Player = Class.create(Sprite, {
+//02 Triangle Class
+Triangle = Class.create(Sprite, {
     initialize: function() {
          Sprite.call(this, 16, 16);
          this.image = game.assets['icon0.png'];
@@ -21,63 +21,11 @@ Player = Class.create(Sprite, {
 
     onenterframe: function() {
         
-        //03 Player Controls
+        //03 Triangle Controls
         
         //04 Mouse Update
     }
 });
-
-//05 Gem Class
-Gem = Class.create(Sprite, {
-    initialize: function() {
-        Sprite.call(this, 16, 16);
-        this.image = game.assets['diamond-sheet.png'];
-    },
-
-    onenterframe: function() {
-
-        //Rotating using scaleX
-        
-        //07 Collision Check
-    }
-});
-
-//08 Bomb Class
-Bomb = Class.create(Sprite, {
-    initialize: function() {
-        Sprite.call(this, 16, 16);
-        this.image = game.assets['icon0.png'];
-        this.x = Math.random() * (stgWidth - 16);
-        this.y = Math.random() * (stgHeight - 16); //Account for the bottom part
-        if (this.y < 50) {
-            this.y = 50;
-        }
-
-        this.frame = 24;
-    },
-
-    onenterframe: function() {
-        if (this.age === 60) {
-            game.rootScene.removeChild(this);
-        }
-
-        if (this.intersect(player)) {
-            player.health--;
-            game.rootScene.removeChild(this);
-            console.log("ouch!");
-        }
-
-        if (this.age % 10 === 0) {
-            if (this.frame === 25) {
-                this.frame = 24;
-            } else {
-                this.frame++;
-            }
-        }
-    }
-
-});
-
 
 //Begin game code
 window.onload = function() {
@@ -92,23 +40,15 @@ window.onload = function() {
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
         
-        //02 Add Player
-        player = new Player();
-        game.root.addChild(player);
+        //02 Add Triangle
+        tri = new Triangle();
+        game.rootScene.addChild(tri);
         
-        //05 Add Gem
-        
-        //06 Create Label
-        
-        //08 Health Label
-        
-        //04 Touch Listener
         
         //Game Condition Check
         game.rootScene.addEventListener('enterframe', function() {
             //08 Game Over
             
-            //08 Make Bomb Generator
         });
 
     }
