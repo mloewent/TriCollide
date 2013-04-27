@@ -1,6 +1,5 @@
 enchant(); //the magic words that start enchant.js
 //Stage Variables
-
 var HEALTH = 5;
 
 var triWidth = 100
@@ -20,7 +19,13 @@ var PURPLE = 2;
 var RIGHT = 1;
 var LEFT = -1;
 
-var DEFAULT_SPEED = 2;
+var DEFAULT_SPEED = 20;
+
+//------------------
+//Global vars
+var triangleList = [];
+var health = 10;
+var healthLabel = new Label("Health" + health);
 
 //02 Triangle Class
 Triangle = Class.create(Sprite, {
@@ -34,6 +39,7 @@ Triangle = Class.create(Sprite, {
 		 this.speed = DEFAULT_SPEED;
 		 this.direction = direction;
 		 this.frame = color;
+		 this.color = color;
         //03 Bind Keys
         
         //04 Mouse Variables
@@ -42,7 +48,19 @@ Triangle = Class.create(Sprite, {
     onenterframe: function() {
         this.x += (this.direction) * this.speed;
         //03 Triangle Controls
-        
+		for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+			if (this.intersect(triangleList[triangleNdx]) && triangleList[triangleNdx] !== this) {
+				
+				console.log("Set sail for fail!");
+				game.rootScene.removeChild(this);
+				game.rootScene.removeChild(triangleList[triangleNdx]);
+				health -= 1;
+			}
+		}
+		
+		if (this.x < (-1 * this.width) || this.x > (STG_WIDTH + this.width)) {
+			game.rootScene.removeChild(this);
+		}
         //04 Mouse Update
     },
 	
@@ -86,13 +104,20 @@ window.onload = function() {
 		{
 			tri = new Triangle((numTris%3), Math.floor(Math.random() * NUMLANES),
 				Math.floor(Math.random() * STG_WIDTH), ((numTris%2) ? 1 : -1));
+			triangleList.push(tri);
 			game.rootScene.addChild(tri);
 		}
+		
+		//Health label
         
+		healthLabel.color = "white";
+		healthLabel.font = "48px monospace";
+		game.rootScene.addChild(healthLabel);
+		
         //Game Condition Check
         game.rootScene.addEventListener('enterframe', function() {
             //08 Game Over
-            
+            healthLabel.text = "Health" + health;
         });
 
     }
