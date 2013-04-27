@@ -11,7 +11,7 @@ var BOMB_COOLDOWN = 30; //in seconds
 
 var WALL_WIDTH = 150; 
 var WALL_HEIGHT = 100;
-var WALL_COOLDOWN = 10; //in seconds
+var WALL_COOLDOWN = 3; //in seconds
 
 var EXPLOSION_WIDTH = 125;
 var EXPLOSION_HEIGHT = 125;
@@ -65,8 +65,14 @@ var chime = new Howl({
   urls: ['chime1.wav']
 });
 
+var bgMusic = new Howl({
+  urls: ['bgmusic.mp3'],
+  loop: true
+});
+
+
 Wall = Class.create(Sprite, {
-    initialize: function(laneNum, x, direction, size, color) {
+    initialize: function(laneNum, x, direction, color) {
        Sprite.call(this, WALL_WIDTH, WALL_HEIGHT);
        this.image = game.assets['wall.png'];
 	   this.color = color;
@@ -75,6 +81,7 @@ Wall = Class.create(Sprite, {
        this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
 	            + GAMESCREEN/(NUMLANES * 2) - this.height / 2;
 	   this.speed = DEFAULT_SPEED;
+       this.scaleX = direction;
 	   this.direction = direction;
     },
 
@@ -83,9 +90,9 @@ Wall = Class.create(Sprite, {
 
         for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
            if (this.intersect(triangleList[triangleNdx]) && (this.color === triangleList[triangleNdx].id)) {
-				if (time % 3 == 0) {
+				if (time % 3 === 0) {
 					chime.play();
-                    //health++;
+                    health++;
 				}
 				break;               
            } else if (this.intersect(triangleList[triangleNdx])) {
@@ -312,6 +319,7 @@ window.onload = function() {
     game.onload = function() { //Prepares the game
         //01 Add Background
         bg = new Sprite(STG_WIDTH, STG_HEIGHT);
+        bgMusic.play();
         game.assets['bgmusic.mp3'].play(-1);
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
