@@ -18,8 +18,6 @@ var EXPLOSION_HEIGHT = 125;
 var EXPLOSION_FRAMES = 5;
 var EXPLOSION_ANIM_RATE = 4;
 
-var EPSILON = 0.1;
-
 var STG_WIDTH = 1024;
 var STG_HEIGHT = 768;
 var FOOTERHEIGHT = 50;
@@ -292,12 +290,13 @@ window.onload = function() {
 
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
         'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
-        'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png');
+        'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png', 'bgmusic.mp3');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
         //01 Add Background
         bg = new Sprite(STG_WIDTH, STG_HEIGHT);
+        game.assets['bgmusic.mp3'].play(-1);
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
         
