@@ -14,6 +14,8 @@ var EXPLOSION_HEIGHT = 125;
 var EXPLOSION_FRAMES = 5;
 var EXPLOSION_ANIM_RATE = 4;
 
+var EPSILON = 0.1;
+
 var STG_WIDTH = 1024;
 var STG_HEIGHT = 768;
 var FOOTERHEIGHT = 50;
@@ -28,14 +30,16 @@ var RIGHT = 1;
 var LEFT = -1;
 
 var DEFAULT_SPEED = 20;
-var SPAWN_RATE = 2;
+var SPAWN_RATE = 5;
 var FRAME_RATE = 30
 //------------------
 //Global vars
 var triangleList = [];
 var powerupList = [];
-var health = 10;
-var healthLabel = new Label("Health" + health);
+var health = 5;
+var healthLabel = new Label("Health: " + health);
+healthLabel.font = "48px Monospace"
+healthLabel.color = "white"
 var time = 0;
 var triSpawnTimer = 0;
 var frameTime = 1 / FRAME_RATE;
@@ -190,7 +194,9 @@ Triangle = Class.create(Sprite, {
                         health--;
                     // If they're the same color
                     } else {
-                        health++;
+                        if (health < HP_MAX) {
+                           health++;
+                        } 
                     }
 
                     game.rootScene.removeChild(this);
@@ -244,7 +250,7 @@ window.onload = function() {
 		
 		//Health Bar and Mask
       
-		var healthBar = new Sprite(HP_W, HEADERHEIGHT);
+      /*var healthBar = new Sprite(HP_W, HEADERHEIGHT);
       healthBar.image = game.assets['healthBar.png'];
       healthBar.x = 10;
       healthBar.y = 10;
@@ -252,25 +258,38 @@ window.onload = function() {
       
       var healthMask = new Sprite(HP_W, HEADERHEIGHT);
       healthMask.image = game.assets['healthMask.png'];
-      healthMask.scale(0, 1);
-      healthMask.x = 10 + HP_W;
+      healthMask.scale(.5, 1);
+      healthMask.x = 10 + HP_W * .25;
       healthMask.y = 10;
       healthMask.opacity = 0.65;
-      game.rootScene.addChild(healthMask);
+      //game.rootScene.addChild(healthMask);*/
+      game.rootScene.addChild(healthLabel);
+
       var healthUpdate = health;
 		
-        //Game update
-        game.rootScene.addEventListener('enterframe', function() {
+      //Game update
+      game.rootScene.addEventListener('enterframe', function() {
          triSpawnTimer += frameTime;
-			time++;
-            startY = Math.floor(Math.random() * NUMLANES);
+         time++;
+         startY = Math.floor(Math.random() * NUMLANES);
 
-         if (health != healthUpdate) {
-            healthMaskXScale = (HP_MAX - health) / HP_MAX;
-            healthMask.scale(healthMaskXScale, 1);
-            healthMask.x = 10 + (1 - healthMaskXScale) * HP_W;
-            healthUpdate = health;
+         if (health <= 0) {
+            game.end();
          }
+
+         healthLabel.text = "Health: " + health;
+         /*if (health != healthUpdate) {
+            healthMask.image = game.assets['healthMask.png'];
+            healthMask.x = 0;
+            healthMask.y = 0;
+            healthMaskXScale = (HP_MAX - health) / HP_MAX;
+            console.log("Health scale is " + healthMaskXScale);
+
+            healthMask.scaleX = healthMaskXScale;
+            healthMask.x = 10 + (1 - healthMaskXScale) * HP_W;
+            healthMask.y = 10;
+            healthUpdate = health;
+         }*/
 			if (triSpawnTimer > 1 / SPAWN_RATE) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				
@@ -280,11 +299,9 @@ window.onload = function() {
                    if (startY !== triangleList[triangleNdx].lane)
                       continue;
 
-                     console.log("moo");
                    if (dir === RIGHT) {
                       if (triangleList[triangleNdx].direction === LEFT
                           && triangleList[triangleNdx].x < STG_WIDTH/ 3) {
-                         console.log("Not spawning an arrow");
                          laneSpaceExists = false; break;
                       }
                    } else {
