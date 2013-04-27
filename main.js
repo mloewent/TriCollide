@@ -18,8 +18,6 @@ var EXPLOSION_HEIGHT = 125;
 var EXPLOSION_FRAMES = 5;
 var EXPLOSION_ANIM_RATE = 4;
 
-var EPSILON = 0.1;
-
 var STG_WIDTH = 1024;
 var STG_HEIGHT = 768;
 var FOOTERHEIGHT = 50;
@@ -29,6 +27,8 @@ var NUMLANES = 5;
 var LANEHEIGHT = 6;
 var HP_W = 341;
 var HP_MAX = 10;
+
+var SCOREX = 300;
 
 var RIGHT = 1;
 var LEFT = -1;
@@ -50,6 +50,8 @@ var wallList = [];
 var time = 0;
 var triSpawnTimer = 0;
 var frameTime = 1 / FRAME_RATE;
+var score = 0;
+var scoreLabel = new Label("Score : " + score);
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from, to) {
@@ -292,12 +294,13 @@ window.onload = function() {
 
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
         'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
-        'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png');
+        'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png', 'bgmusic.mp3');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
         //01 Add Background
         bg = new Sprite(STG_WIDTH, STG_HEIGHT);
+        game.assets['bgmusic.mp3'].play(-1);
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
         
@@ -308,6 +311,11 @@ window.onload = function() {
 			game.rootScene.addChild(wire);
 		}
 		
+		
+		scoreLabel.x = STG_WIDTH - SCOREX;
+		scoreLabel.font = "36px Comic Sans MS";
+		scoreLabel.color = "white";
+		game.rootScene.addChild(scoreLabel);
 		//Health Bar and Mask
       
       /*var healthBar = new Sprite(HP_W, HEADERHEIGHT);
@@ -391,7 +399,11 @@ window.onload = function() {
                 powerupList.push(bomb);
                 game.rootScene.addChild(bomb);
             }
-
+			
+			
+			score++;
+			scoreLabel.text = "Score : " + score;
+			
             if (time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				startY = Math.floor(Math.random() * NUMLANES);
