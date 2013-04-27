@@ -255,12 +255,18 @@ window.onload = function() {
       healthMask.y = 10;
       healthMask.opacity = 0.65;
       game.rootScene.addChild(healthMask);
+      var healthUpdate = health;
 		
         //Game update
         game.rootScene.addEventListener('enterframe', function() {
-            triSpawnTimer += frameTime;
+         triSpawnTimer += frameTime;
 			time++;
-            //healthMask.scale(-10-health, 1);
+         if (health != healthUpdate) {
+            healthMaskXScale = (HP_MAX - health) / HP_MAX;
+            healthMask.scale(healthMaskXScale, 1);
+            healthMask.x = 10 + (1 - healthMaskXScale) * HP_W;
+            healthUpdate = health;
+         }
 			if (triSpawnTimer > 1 / SPAWN_RATE) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				
