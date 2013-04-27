@@ -34,6 +34,7 @@ var FRAME_RATE = 30
 //Global vars
 var triangleList = [];
 var powerupList = [];
+var wallList = [];
 var health = 10;
 var healthLabel = new Label("Health" + health);
 var time = 0;
@@ -46,6 +47,57 @@ Array.prototype.remove = function(from, to) {
   this.length = from < 0 ? this.length + from : from;
   return this.push.apply(this, rest);
 };
+
+var chime = new Howl({
+  urls: ['chime1.wav']
+});
+
+Wall = Class.create(Sprite, {
+    initialize: function(laneNum, x, direction, size, color) {
+       Sprite.call(this, BOMB_HEIGHT, BOMB_WIDTH);
+       this.image = game.assets['wall.png'];
+	   this.color = color;
+	   this.frame = color;
+	   this.scale(size, 1);
+       this.x = STG_WIDTH/2;
+       this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
+	            + GAMESCREEN/(NUMLANES * 2) - this.height / 2;
+	   this.speed = DEFAULT_SPEED;
+	   this.direction = direction;
+    },
+
+    onenterframe: function() {
+        //this.x += this.direction * this.speed;
+        for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+           if (this.intersect(triangleList[triangleNdx]) && (this.color === triangleList[triangleNdx].id)) {
+				if (time % 3 == 0) {
+					chime.play();
+				}
+				health++;
+				break;               
+           }
+		   else if (this.intersect(triangleList[triangleNdx])) {
+				expX = (this.x + triangleList[triangleNdx].x) / 2;
+                    effect = new Effect(expX, this.y, 
+                                        EXPLOSION_WIDTH * 2, 
+                                        EXPLOSION_HEIGHT * 2, 
+                                        game.assets['exlposions.png'], triangleList[triangleNdx].id * EXPLOSION_FRAMES, 
+                                        (triangleList[triangleNdx].id + 1) * EXPLOSION_FRAMES - 1, EXPLOSION_ANIM_RATE)
+
+                    game.rootScene.addChild(effect);
+					
+					health--;
+					
+					game.rootScene.removeChild(this);
+                    game.rootScene.removeChild(triangleList[triangleNdx]);
+                    triangleList.remove(triangleNdx);
+                    curTriIdx = triangleList.indexOf(this);
+                    triangleList.remove(curTriIdx);
+		   }
+        }
+	}
+});
+
 
 Lane = Class.create(Sprite, {
    initialize: function(y) {
@@ -226,7 +278,7 @@ window.onload = function() {
     //Any resources not preloaded will not appear
 
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
-        'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png');
+        'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 'wall.png');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
@@ -316,6 +368,9 @@ window.onload = function() {
                 game.rootScene.addChild(bomb);
             }
         });
+		
+		var wall = new Wall(1,0,1,3, Math.floor(Math.random() * 3));
+		game.rootScene.addChild(wall);
 
             
 
