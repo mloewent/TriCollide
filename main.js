@@ -52,5 +52,8 @@ window.onload = function() {
         });
 
     }
+    var sound = new Howl({
+       urls: ['nyan.ogg']
+    }).play();
     game.start(); //Begin the game
 }
