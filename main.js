@@ -27,7 +27,7 @@ var RIGHT = 1;
 var LEFT = -1;
 
 var DEFAULT_SPEED = 20;
-var SPAWN_RATE = 2;
+var SPAWN_RATE = 8;
 var FRAME_RATE = 30
 //------------------
 //Global vars
@@ -139,6 +139,7 @@ Triangle = Class.create(Sprite, {
          this.chime= game.assets['chime' + 1 + '.wav'];
 		 this.scale(direction, 1);
          this.x = x;
+         this.lane = laneNum;
          this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
 			         + GAMESCREEN/(NUMLANES * 2) - this.image.height / 2;
 		 this.speed = DEFAULT_SPEED;
@@ -157,7 +158,8 @@ Triangle = Class.create(Sprite, {
 		} else {
             for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
                 if (this.intersect(triangleList[triangleNdx]) 
-                    && triangleList[triangleNdx] !== this
+                    && triangleList[triangleNdx] !== this 
+                    && this.direction !== triangleList[triangleNdx].direction
                     && curTriIdx !== triangleNdx) {
 
                     leftTri = this.direction === LEFT ? this : triangleList[triangleNdx];
@@ -259,26 +261,45 @@ window.onload = function() {
         game.rootScene.addEventListener('enterframe', function() {
             triSpawnTimer += frameTime;
 			time++;
+            startY = Math.floor(Math.random() * NUMLANES);
+
             //healthMask.scale(-10-health, 1);
 			if (triSpawnTimer > 1 / SPAWN_RATE) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				
-                /*var laneSpaceExists = true;
+                var laneSpaceExists = true;
                 for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
-                   if (this.dir === RIGHT) {
-                      if (triangleList[triangleNdx].dir === LEFT 
-                          && triangleList[triangleNdx].x > STG_WIDTH * 3 / 4) {}
+                   // If they're not in the same lane
+                   if (startY !== triangleList[triangleNdx].lane)
+                      continue;
+
+                     console.log("moo");
+                   if (dir === RIGHT) {
+                      if (triangleList[triangleNdx].direction === LEFT
+                          && triangleList[triangleNdx].x < STG_WIDTH/ 3) {
+                         console.log("Not spawning an arrow");
+                         laneSpaceExists = false; break;
+                      }
+                   } else {
+                      if (triangleList[triangleNdx].direction === RIGHT 
+                          && triangleList[triangleNdx].x > STG_WIDTH * 2 / 3) {
+                         console.log("Not spawning an arrow");
+                         laneSpaceExists = false; break;
+
+                      }
                    }
-                }*/
-				startX = dir === RIGHT ? -triWidth: STG_WIDTH;
-				startY = Math.floor(Math.random() * NUMLANES);
-				tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
-				triangleList.push(tri);
-				game.rootScene.addChild(tri);
-                triSpawnTimer = 0;
+                }
+
+                if (laneSpaceExists) {
+                    startX = dir === RIGHT ? -triWidth: STG_WIDTH;
+                    tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
+                    triangleList.push(tri);
+                    game.rootScene.addChild(tri);
+                    triSpawnTimer = 0;
+                }
 			}
             
-            if (time % FRAME_RATE * BOMB_COOLDOWN  === 0) {
+            if (time % (FRAME_RATE * BOMB_COOLDOWN)  === 0) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				startY = Math.floor(Math.random() * NUMLANES);
 				startX = dir === RIGHT ? -BOMB_WIDTH: STG_WIDTH;
