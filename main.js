@@ -56,17 +56,18 @@ Lane = Class.create(Sprite, {
 
 //02 Triangle Class
 Triangle = Class.create(Sprite, {
-    initialize: function(color, laneNum, x, direction) {
+    initialize: function(id, laneNum, x, direction) {
          Sprite.call(this, triWidth, triHeight);
          this.image = game.assets['tri1.png'];
+         this.chime= game.assets['chime' + 1 + '.wav'];
 		 this.scale(direction, 1);
          this.x = x;
          this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
 			         + GAMESCREEN/(NUMLANES * 2) - this.image.height / 2;
 		 this.speed = DEFAULT_SPEED;
 		 this.direction = direction;
-		 this.frame = color;
-		 this.color = color;
+		 this.frame = id;
+		 this.id = id;
     },
 
     onenterframe: function() {
@@ -82,13 +83,17 @@ Triangle = Class.create(Sprite, {
                     && triangleList[triangleNdx] !== this
                     && curTriIdx !== triangleNdx) {
 
-                    console.log("Removing item at " + triangleNdx + " and " + curTriIdx);
+                    if (this.id !== triangleList[triangleNdx].id) {
+                        this.chime.play();
+                    } else {
+
+                    }
+
                     game.rootScene.removeChild(this);
                     game.rootScene.removeChild(triangleList[triangleNdx]);
                     triangleList.remove(triangleNdx);
                     curTriIdx = triangleList.indexOf(this);
                     triangleList.remove(curTriIdx);
-                    console.log("Triangle list length is " + triangleList.length);
 
                     health--;
                     break;
@@ -116,7 +121,7 @@ window.onload = function() {
     game = new Game(STG_WIDTH, STG_HEIGHT);
     //Preload images
     //Any resources not preloaded will not appear
-    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png');
+    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
@@ -149,7 +154,7 @@ window.onload = function() {
 				
 				startX = dir === RIGHT ? -triWidth: STG_WIDTH;
 				startY = Math.floor(Math.random() * NUMLANES);
-				tri = new Triangle(Math.floor(Math.random() * 3), 0, startX, dir);
+				tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
 				triangleList.push(tri);
 				game.rootScene.addChild(tri);
                 triSpawnTimer = 0;
