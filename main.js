@@ -54,6 +54,25 @@ Lane = Class.create(Sprite, {
 
 });
 
+Effect = Class.create(Sprite, {
+   initialize: function(x, y, startFrame, endFrame, animationRate) {
+      this.x = x; 
+      this.y = y;
+      this.frame = startFrame;
+      this.endFrame= endFrame;
+      this.animRate = animationRate;
+   },
+
+   onenterframe: function() {
+      if (this.age % animationRate === 0) {
+         this.frame++
+         if (this.frame > this.endFrame) {
+            game.rootScene.removeChild(this);
+         }
+      }
+   }
+});
+
 //02 Triangle Class
 Triangle = Class.create(Sprite, {
     initialize: function(id, laneNum, x, direction) {
