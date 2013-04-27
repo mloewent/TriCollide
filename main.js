@@ -12,6 +12,7 @@ var FOOTERHEIGHT = 50;
 var HEADERHEIGHT = 50; //The health bar block
 var GAMESCREEN = STG_HEIGHT - HEADERHEIGHT - FOOTERHEIGHT;
 var NUMLANES = 5;
+var LANEHEIGHT = 6;
 
 var GREEN = 0;
 var BLUE = 1;
@@ -21,6 +22,23 @@ var RIGHT = 1;
 var LEFT = -1;
 
 var DEFAULT_SPEED = 2;
+
+
+Lane = Class.create(Sprite, {
+   initialize: function(y, startFrame) {
+      Sprite.call(this, STG_WIDTH, LANEHEIGHT);
+      var laneImg = game.assets['lane.png'];
+      this.y = y;
+      this.image = laneImg;
+      this.frame = startFrame;
+   },
+   
+   onenterframe: function() {
+      if (this.age % 6 === 0)
+         this.frame = (this.frame + 1) % 12;
+   }
+
+});
 
 //02 Triangle Class
 Triangle = Class.create(Sprite, {
@@ -72,13 +90,12 @@ window.onload = function() {
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
         
-		var laneImg = game.assets['lane.png'];
+		//var laneImg = game.assets['lane.png'];
 		for (var laneWire = 0; laneWire <= NUMLANES; laneWire++) {
-			wire = new Sprite(laneImg.width, laneImg.height);
-			wire.image = laneImg;
+			lanepos = HEADERHEIGHT + laneWire * GAMESCREEN/NUMLANES + GAMESCREEN/(NUMLANES * 2)
+			         - LANEHEIGHT / 2;
+         wire = new Lane(lanepos, Math.floor(Math.random() * LANEHEIGHT));
 			game.rootScene.addChild(wire);
-			wire.y = HEADERHEIGHT + laneWire * GAMESCREEN/NUMLANES + GAMESCREEN/(NUMLANES * 2)
-			         - wire.image.height / 2;
 		}
 		
         //02 Add Triangle
