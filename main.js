@@ -2,16 +2,16 @@ enchant(); //the magic words that start enchant.js
 //Stage Variables
 var HEALTH = 5;
 
-var triWidth = 100
-var triHeight = 100;
+var triWidth = 125;
+var triHeight = 125;
 
 var BOMB_WIDTH = 100; 
 var BOMB_HEIGHT = 100;
 var BOMB_COOLDOWN = 30; //in seconds
 
-var WALL_WIDTH = 100; 
+var WALL_WIDTH = 150; 
 var WALL_HEIGHT = 100;
-var WALL_COOLDOWN = 20; //in seconds
+var WALL_COOLDOWN = 10; //in seconds
 
 var EXPLOSION_WIDTH = 125;
 var EXPLOSION_HEIGHT = 125;
@@ -35,8 +35,9 @@ var LEFT = -1;
 
 var NUM_COLORS = 3;
 
-var DEFAULT_SPEED = 20;
-var SPAWN_RATE = 5;
+var DEFAULT_SPEED = 8;
+var SPAWN_RATE = 2;
+var SPAWN_RATE_INCR = 1.05;
 var FRAME_RATE = 30
 //------------------
 //Global vars
@@ -66,7 +67,7 @@ var chime = new Howl({
 
 Wall = Class.create(Sprite, {
     initialize: function(laneNum, x, direction, size, color) {
-       Sprite.call(this, WALL_HEIGHT, WALL_WIDTH);
+       Sprite.call(this, WALL_WIDTH, WALL_HEIGHT);
        this.image = game.assets['wall.png'];
 	   this.color = color;
 	   this.frame = color;
@@ -102,6 +103,17 @@ Wall = Class.create(Sprite, {
                 triangleList.remove(triangleNdx);
 		   }
         }
+	},
+
+	ontouchmove: function(e) {
+		
+		// Checks if triangle is in gamescreen
+		if (e.y >= HEADERHEIGHT && e.y <= STG_HEIGHT - FOOTERHEIGHT) {
+			//snap on
+			var lane = Math.floor((e.y - HEADERHEIGHT)/(GAMESCREEN/NUMLANES));
+			this.y = HEADERHEIGHT + lane * GAMESCREEN/NUMLANES 
+			         + GAMESCREEN/(NUMLANES * 2) - this.image.height / 2;
+		}
 	}
 });
 
@@ -401,7 +413,10 @@ window.onload = function() {
             }
 			
 			
-			score++;
+			if (time % 3 === 0) {
+               score++;
+            }
+
 			scoreLabel.text = "Score : " + score;
 			
             if (time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
@@ -413,6 +428,8 @@ window.onload = function() {
                 wallList.push(bomb);
                 game.rootScene.addChild(wall);
             }
+            if (time % FRAME_RATE === 0)
+               SPAWN_RATE = SPAWN_RATE * SPAWN_RATE_INCR;
         });
 
     }
