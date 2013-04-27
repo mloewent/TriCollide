@@ -5,6 +5,11 @@ var HEALTH = 5;
 var triWidth = 100
 var triHeight = 100;
 
+var EXPLOSION_WIDTH = 125;
+var EXPLOSION_HEIGHT = 125;
+var EXPLOSION_FRAMES = 5;
+var EXPLOSION_ANIM_RATE = 4;
+
 var STG_WIDTH = 1024;
 var STG_HEIGHT = 768;
 var FOOTERHEIGHT = 50;
@@ -12,10 +17,6 @@ var HEADERHEIGHT = 50; //The health bar block
 var GAMESCREEN = STG_HEIGHT - HEADERHEIGHT - FOOTERHEIGHT;
 var NUMLANES = 5;
 var LANEHEIGHT = 6;
-
-var GREEN = 0;
-var BLUE = 1;
-var PURPLE = 2;
 
 var RIGHT = 1;
 var LEFT = -1;
@@ -122,11 +123,30 @@ Triangle = Class.create(Sprite, {
                     && triangleList[triangleNdx] !== this
                     && curTriIdx !== triangleNdx) {
 
-                    effect = new Effect(this.x, this.y, 125, 125, game.assets['exlposions.png'], 0, 4, 4)
+                    leftTri = this.direction === LEFT ? this : triangleList[triangleNdx];
+                    rightTri = this.direction === RIGHT ? this : triangleList[triangleNdx];
+
+                    expX = leftTri.x - leftTri.width / 4;
+                    effect = new Effect(expX, leftTri.y, 
+                                        EXPLOSION_WIDTH, 
+                                        EXPLOSION_HEIGHT, 
+                                        game.assets['exlposions.png'], leftTri.id * EXPLOSION_FRAMES, 
+                                        (leftTri.id + 1) * EXPLOSION_FRAMES - 1, EXPLOSION_ANIM_RATE)
+
                     game.rootScene.addChild(effect);
+
+                    expX = rightTri.x + rightTri.width / 4;
+                    effect = new Effect(expX, rightTri.y, 
+                                        EXPLOSION_WIDTH, 
+                                        EXPLOSION_HEIGHT, 
+                                        game.assets['exlposions.png'], rightTri.id * EXPLOSION_FRAMES, 
+                                        (rightTri.id + 1) * EXPLOSION_FRAMES - 1, EXPLOSION_ANIM_RATE)
+
+                    game.rootScene.addChild(effect);
+
                     // If they're the same color
                     if (this.id !== triangleList[triangleNdx].id) {
-                        this.chime.play();
+                        //this.chime.play();
                         health--;
                     // If they're the same color
                     } else {
@@ -173,7 +193,6 @@ window.onload = function() {
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
         
-		//var laneImg = game.assets['lane.png'];
 		for (var laneWire = 0; laneWire <= NUMLANES; laneWire++) {
 			lanepos = HEADERHEIGHT + laneWire * GAMESCREEN/NUMLANES + GAMESCREEN/(NUMLANES * 2)
 			         - LANEHEIGHT / 2;
@@ -197,7 +216,7 @@ window.onload = function() {
 				
 				startX = dir === RIGHT ? -triWidth: STG_WIDTH;
 				startY = Math.floor(Math.random() * NUMLANES);
-				tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
+				tri = new Triangle(Math.floor(Math.random() * 3), 0, startX, dir);
 				triangleList.push(tri);
 				game.rootScene.addChild(tri);
                 triSpawnTimer = 0;
