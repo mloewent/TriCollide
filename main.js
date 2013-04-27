@@ -2,14 +2,16 @@ enchant(); //the magic words that start enchant.js
 //Stage Variables
 var moveSpeed = 4;
 var health = 5;
-var stgWidth = 320;
-var stgHeight = 320;
+var stgWidth = 1024;
+var stgHeight = 768;
+var triWidth = 16;
+var triHeight = 16;
 
 
 //02 Triangle Class
 Triangle = Class.create(Sprite, {
     initialize: function() {
-         Sprite.call(this, 16, 16);
+         Sprite.call(this, triWidth, triHeight);
          this.image = game.assets['icon0.png'];
          this.x = stgWidth/2;
          this.y = stgHeight/2;
