@@ -9,6 +9,10 @@ var BOMB_WIDTH = 100;
 var BOMB_HEIGHT = 100;
 var BOMB_COOLDOWN = 30; //in seconds
 
+var WALL_WIDTH = 100; 
+var WALL_HEIGHT = 100;
+var WALL_COOLDOWN = 20; //in seconds
+
 var EXPLOSION_WIDTH = 125;
 var EXPLOSION_HEIGHT = 125;
 var EXPLOSION_FRAMES = 5;
@@ -29,6 +33,8 @@ var HP_MAX = 10;
 var RIGHT = 1;
 var LEFT = -1;
 
+var NUM_COLORS = 3;
+
 var DEFAULT_SPEED = 20;
 var SPAWN_RATE = 5;
 var FRAME_RATE = 30
@@ -40,6 +46,7 @@ var health = 5;
 var healthLabel = new Label("Health: " + health);
 healthLabel.font = "48px Monospace"
 healthLabel.color = "white"
+var wallList = [];
 var time = 0;
 var triSpawnTimer = 0;
 var frameTime = 1 / FRAME_RATE;
@@ -50,6 +57,52 @@ Array.prototype.remove = function(from, to) {
   this.length = from < 0 ? this.length + from : from;
   return this.push.apply(this, rest);
 };
+
+var chime = new Howl({
+  urls: ['chime1.wav']
+});
+
+Wall = Class.create(Sprite, {
+    initialize: function(laneNum, x, direction, size, color) {
+       Sprite.call(this, WALL_HEIGHT, WALL_WIDTH);
+       this.image = game.assets['wall.png'];
+	   this.color = color;
+	   this.frame = color;
+       this.x = x;
+       this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
+	            + GAMESCREEN/(NUMLANES * 2) - this.height / 2;
+	   this.speed = DEFAULT_SPEED;
+	   this.direction = direction;
+    },
+
+    onenterframe: function() {
+        this.x += this.direction * this.speed;
+
+        for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+           if (this.intersect(triangleList[triangleNdx]) && (this.color === triangleList[triangleNdx].id)) {
+				if (time % 3 == 0) {
+					chime.play();
+                    //health++;
+				}
+				break;               
+           } else if (this.intersect(triangleList[triangleNdx])) {
+				expX = (this.x + triangleList[triangleNdx].x) / 2;
+                effect = new Effect(expX, this.y, 
+                                    EXPLOSION_WIDTH, 
+                                    EXPLOSION_HEIGHT, 
+                                    game.assets['exlposions.png'], triangleList[triangleNdx].id * EXPLOSION_FRAMES, 
+                                    (triangleList[triangleNdx].id + 1) * EXPLOSION_FRAMES - 1, EXPLOSION_ANIM_RATE)
+
+                game.rootScene.addChild(effect);
+                
+                health--;
+                game.rootScene.removeChild(triangleList[triangleNdx]);
+                triangleList.remove(triangleNdx);
+		   }
+        }
+	}
+});
+
 
 Lane = Class.create(Sprite, {
    initialize: function(y) {
@@ -101,6 +154,10 @@ Bomb = Class.create(Sprite, {
     },
 
     onenterframe: function() {
+		if (this.x < (-1 * this.width) || this.x > (STG_WIDTH + this.width)) {
+			game.rootScene.removeChild(this);
+            wallList.remove(curTriIdx);
+        }
         this.x += this.direction * this.speed;
         var id = -1;
         for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
@@ -235,7 +292,7 @@ window.onload = function() {
 
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
         'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
-        'chime0.wav', 'chime2.wav', 'explosion.mp3');
+        'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
@@ -310,7 +367,6 @@ window.onload = function() {
                    } else {
                       if (triangleList[triangleNdx].direction === RIGHT 
                           && triangleList[triangleNdx].x > STG_WIDTH * 2 / 3) {
-                         console.log("Not spawning an arrow");
                          laneSpaceExists = false; break;
 
                       }
@@ -319,7 +375,7 @@ window.onload = function() {
 
                 if (laneSpaceExists) {
                     startX = dir === RIGHT ? -triWidth: STG_WIDTH;
-                    tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
+                    tri = new Triangle(Math.floor(Math.random() * NUM_COLORS), startY, startX, dir);
                     triangleList.push(tri);
                     game.rootScene.addChild(tri);
                     triSpawnTimer = 0;
@@ -335,9 +391,17 @@ window.onload = function() {
                 powerupList.push(bomb);
                 game.rootScene.addChild(bomb);
             }
-        });
 
-            
+            if (time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
+				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
+				startY = Math.floor(Math.random() * NUMLANES);
+				startX = dir === RIGHT ? -WALL_WIDTH: STG_WIDTH;
+    
+                var wall = new Wall(startY, startX, dir, Math.floor(Math.random() * NUM_COLORS));
+                wallList.push(bomb);
+                game.rootScene.addChild(wall);
+            }
+        });
 
     }
     game.start(); 
