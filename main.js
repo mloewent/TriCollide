@@ -24,6 +24,8 @@ var LANEHEIGHT = 6;
 var HP_W = 341;
 var HP_MAX = 10;
 
+var SCOREX = 300;
+
 var RIGHT = 1;
 var LEFT = -1;
 
@@ -40,6 +42,8 @@ var healthLabel = new Label("Health" + health);
 var time = 0;
 var triSpawnTimer = 0;
 var frameTime = 1 / FRAME_RATE;
+var score = 0;
+var scoreLabel = new Label("Score : " + score);
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from, to) {
@@ -58,7 +62,7 @@ Wall = Class.create(Sprite, {
        this.image = game.assets['wall.png'];
 	   this.color = color;
 	   this.frame = color;
-	   this.scale(size, 1);
+	   this.scale(5, 1);
        this.x = STG_WIDTH/2;
        this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
 	            + GAMESCREEN/(NUMLANES * 2) - this.height / 2;
@@ -294,6 +298,11 @@ window.onload = function() {
 			game.rootScene.addChild(wire);
 		}
 		
+		
+		scoreLabel.x = STG_WIDTH - SCOREX;
+		scoreLabel.font = "36px Comic Sans MS";
+		scoreLabel.color = "white";
+		game.rootScene.addChild(scoreLabel);
 		//Health Bar and Mask
       
 		var healthBar = new Sprite(HP_W, HEADERHEIGHT);
@@ -367,12 +376,16 @@ window.onload = function() {
                 powerupList.push(bomb);
                 game.rootScene.addChild(bomb);
             }
+			
+			
+			score++;
+			scoreLabel.text = "Score : " + score;
         });
 		
 		var wall = new Wall(1,0,1,3, Math.floor(Math.random() * 3));
 		game.rootScene.addChild(wall);
-
-            
+		
+		
 
     }
     game.start(); 
