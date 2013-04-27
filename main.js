@@ -27,7 +27,7 @@ var DEFAULT_SPEED = 20;
 var triangleList = [];
 var health = 10;
 var healthLabel = new Label("Health" + health);
-
+var time = 0;
 
 Lane = Class.create(Sprite, {
    initialize: function(y, startFrame) {
@@ -116,15 +116,6 @@ window.onload = function() {
 			game.rootScene.addChild(wire);
 		}
 		
-        //02 Add Triangle
-		for (var numTris = 0; numTris < 10; numTris++)
-		{
-			tri = new Triangle((numTris%3), Math.floor(Math.random() * NUMLANES),
-				Math.floor(Math.random() * STG_WIDTH), ((numTris%2) ? 1 : -1));
-			triangleList.push(tri);
-			game.rootScene.addChild(tri);
-		}
-		
 		//Health label
         
 		healthLabel.color = "white";
@@ -133,8 +124,17 @@ window.onload = function() {
 		
         //Game Condition Check
         game.rootScene.addEventListener('enterframe', function() {
-            //08 Game Over
+			time++;
             healthLabel.text = "Health" + health;
+			if (time % 5 === 0) {
+				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
+				
+				startX = dir === RIGHT ? 0: STG_WIDTH - triWidth;
+				startY = Math.floor(Math.random() * NUMLANES);
+				tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
+				triangleList.push(tri);
+				game.rootScene.addChild(tri);
+			}
         });
 
     }
