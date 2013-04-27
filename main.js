@@ -55,16 +55,18 @@ Lane = Class.create(Sprite, {
 });
 
 Effect = Class.create(Sprite, {
-   initialize: function(x, y, startFrame, endFrame, animationRate) {
+   initialize: function(x, y, spriteWid, spriteHght, image, startFrame, endFrame, animationRate) {
+      Sprite.call(this, spriteWid, spriteHght);
       this.x = x; 
       this.y = y;
       this.frame = startFrame;
       this.endFrame= endFrame;
       this.animRate = animationRate;
+      this.image = image;
    },
 
    onenterframe: function() {
-      if (this.age % animationRate === 0) {
+      if (this.age % this.animRate === 0) {
          this.frame++
          if (this.frame > this.endFrame) {
             game.rootScene.removeChild(this);
@@ -73,7 +75,25 @@ Effect = Class.create(Sprite, {
    }
 });
 
-//02 Triangle Class
+Slidable = Class.create(Sprite, {
+    initialize: function(laneNum, x, direction, image) {
+       Sprite.call(this, triWidth, triHeight);
+       this.image = image;
+	   this.scale(direction, 1);
+       this.x = x;
+       this.y = HEADERHEIGHT + laneNum * GAMESCREEN/NUMLANES 
+	            + GAMESCREEN/(NUMLANES * 2) - this.image.height / 2;
+	   this.speed = DEFAULT_SPEED;
+	   this.direction = direction;
+    },
+
+    onenterframe: function() {
+        this.x += this.direction * this.speed;
+    }
+
+});
+
+// Triangle Class
 Triangle = Class.create(Sprite, {
     initialize: function(id, laneNum, x, direction) {
          Sprite.call(this, triWidth, triHeight);
@@ -102,10 +122,15 @@ Triangle = Class.create(Sprite, {
                     && triangleList[triangleNdx] !== this
                     && curTriIdx !== triangleNdx) {
 
+                    effect = new Effect(this.x, this.y, 125, 125, game.assets['exlposions.png'], 0, 4, 4)
+                    game.rootScene.addChild(effect);
+                    // If they're the same color
                     if (this.id !== triangleList[triangleNdx].id) {
                         this.chime.play();
+                        health--;
+                    // If they're the same color
                     } else {
-
+                        health++;
                     }
 
                     game.rootScene.removeChild(this);
@@ -114,7 +139,6 @@ Triangle = Class.create(Sprite, {
                     curTriIdx = triangleList.indexOf(this);
                     triangleList.remove(curTriIdx);
 
-                    health--;
                     break;
                 }
             }
@@ -140,7 +164,7 @@ window.onload = function() {
     game = new Game(STG_WIDTH, STG_HEIGHT);
     //Preload images
     //Any resources not preloaded will not appear
-    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav');
+    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 'exlposions.png');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
