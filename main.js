@@ -21,13 +21,23 @@ var RIGHT = 1;
 var LEFT = -1;
 
 var DEFAULT_SPEED = 20;
-
+var SPAWN_RATE = 2;
+var FRAME_RATE = 30
 //------------------
 //Global vars
 var triangleList = [];
 var health = 10;
 var healthLabel = new Label("Health" + health);
 var time = 0;
+var triSpawnTimer = 0;
+var frameTime = 1 / FRAME_RATE;
+
+// Array Remove - By John Resig (MIT Licensed)
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
 
 Lane = Class.create(Sprite, {
    initialize: function(y) {
@@ -60,21 +70,32 @@ Triangle = Class.create(Sprite, {
     },
 
     onenterframe: function() {
-        this.x += (this.direction) * this.speed;
-        //03 Triangle Controls
-		for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
-			if (this.intersect(triangleList[triangleNdx]) && triangleList[triangleNdx] !== this) {
-				
-				console.log("Set sail for fail!");
-				game.rootScene.removeChild(this);
-				game.rootScene.removeChild(triangleList[triangleNdx]);
-				health -= 1;
-			}
-		}
-		
+        this.x += this.direction * this.speed;
+
+        var curTriIdx = triangleList.indexOf(this);
 		if (this.x < (-1 * this.width) || this.x > (STG_WIDTH + this.width)) {
 			game.rootScene.removeChild(this);
-		}
+            triangleList.splice(curTriIdx, curTriIdx);
+		} else {
+            for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+                if (this.intersect(triangleList[triangleNdx]) 
+                    && triangleList[triangleNdx] !== this
+                    && curTriIdx !== triangleNdx) {
+
+                    console.log("Removing item at " + triangleNdx + " and " + curTriIdx);
+                    game.rootScene.removeChild(this);
+                    game.rootScene.removeChild(triangleList[triangleNdx]);
+                    triangleList.remove(triangleNdx);
+                    curTriIdx = triangleList.indexOf(this);
+                    triangleList.remove(curTriIdx);
+                    console.log("Triangle list length is " + triangleList.length);
+
+                    health--;
+                    break;
+                }
+            }
+        }
+		
     },
 	
 	ontouchmove: function(e) {
@@ -96,6 +117,7 @@ window.onload = function() {
     //Preload images
     //Any resources not preloaded will not appear
     game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png');
+    game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
         //01 Add Background
@@ -117,18 +139,20 @@ window.onload = function() {
 		healthLabel.font = "48px monospace";
 		game.rootScene.addChild(healthLabel);
 		
-        //Game Condition Check
+        //Game update
         game.rootScene.addEventListener('enterframe', function() {
+            triSpawnTimer += frameTime;
 			time++;
             healthLabel.text = "Health" + health;
-			if (time % 5 === 0) {
+			if (triSpawnTimer > 1 / SPAWN_RATE) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				
-				startX = dir === RIGHT ? 0: STG_WIDTH - triWidth;
+				startX = dir === RIGHT ? -triWidth: STG_WIDTH;
 				startY = Math.floor(Math.random() * NUMLANES);
-				tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
+				tri = new Triangle(Math.floor(Math.random() * 3), 0, startX, dir);
 				triangleList.push(tri);
 				game.rootScene.addChild(tri);
+                triSpawnTimer = 0;
 			}
         });
 
