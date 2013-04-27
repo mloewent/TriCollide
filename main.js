@@ -40,8 +40,6 @@ Lane = Class.create(Sprite, {
    
    onenterframe: function() {
       this.x = (this.x - 40) % STG_WIDTH;
-      //if (this.age % 6 === 0)
-         //this.frame = (this.frame + 1) % 12;
    }
 
 });
@@ -59,9 +57,6 @@ Triangle = Class.create(Sprite, {
 		 this.direction = direction;
 		 this.frame = color;
 		 this.color = color;
-        //03 Bind Keys
-        
-        //04 Mouse Variables
     },
 
     onenterframe: function() {
@@ -80,7 +75,6 @@ Triangle = Class.create(Sprite, {
 		if (this.x < (-1 * this.width) || this.x > (STG_WIDTH + this.width)) {
 			game.rootScene.removeChild(this);
 		}
-        //04 Mouse Update
     },
 	
 	ontouchmove: function(e) {
@@ -139,5 +133,5 @@ window.onload = function() {
         });
 
     }
-    game.start(); //Begin the game
+    game.start(); 
 }
