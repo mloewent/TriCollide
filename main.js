@@ -264,6 +264,13 @@ window.onload = function() {
 			if (triSpawnTimer > 1 / SPAWN_RATE) {
 				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
 				
+                /*var laneSpaceExists = true;
+                for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+                   if (this.dir === RIGHT) {
+                      if (triangleList[triangleNdx].dir === LEFT 
+                          && triangleList[triangleNdx].x > STG_WIDTH * 3 / 4) {}
+                   }
+                }*/
 				startX = dir === RIGHT ? -triWidth: STG_WIDTH;
 				startY = Math.floor(Math.random() * NUMLANES);
 				tri = new Triangle(Math.floor(Math.random() * 3), startY, startX, dir);
