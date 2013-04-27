@@ -7,11 +7,11 @@ var triHeight = 125;
 
 var BOMB_WIDTH = 100; 
 var BOMB_HEIGHT = 100;
-var BOMB_COOLDOWN = 30; //in seconds
+var BOMB_COOLDOWN = 15; //in seconds
 
 var WALL_WIDTH = 150; 
 var WALL_HEIGHT = 100;
-var WALL_COOLDOWN = 3; //in seconds
+var WALL_COOLDOWN = 7; //in seconds
 
 var EXPLOSION_WIDTH = 125;
 var EXPLOSION_HEIGHT = 125;
@@ -92,8 +92,12 @@ Wall = Class.create(Sprite, {
            if (this.intersect(triangleList[triangleNdx]) && (this.color === triangleList[triangleNdx].id)) {
 				if (time % 3 === 0) {
 					chime.play();
-                    health++;
 				}
+                if (time % FRAME_RATE) {
+                    if (health < 10) {
+                        health++;
+                    }
+                }
 				break;               
            } else if (this.intersect(triangleList[triangleNdx])) {
 				expX = (this.x + triangleList[triangleNdx].x) / 2;
