@@ -25,17 +25,18 @@ var DEFAULT_SPEED = 2;
 
 
 Lane = Class.create(Sprite, {
-   initialize: function(y, startFrame) {
-      Sprite.call(this, STG_WIDTH, LANEHEIGHT);
+   initialize: function(y) {
+      Sprite.call(this, STG_WIDTH * 2, LANEHEIGHT);
       var laneImg = game.assets['lane.png'];
       this.y = y;
+      this.x = Math.floor(Math.random() * STG_WIDTH) - STG_WIDTH;
       this.image = laneImg;
-      this.frame = startFrame;
    },
    
    onenterframe: function() {
-      if (this.age % 6 === 0)
-         this.frame = (this.frame + 1) % 12;
+      this.x = (this.x - 40) % STG_WIDTH;
+      //if (this.age % 6 === 0)
+         //this.frame = (this.frame + 1) % 12;
    }
 
 });
@@ -94,7 +95,7 @@ window.onload = function() {
 		for (var laneWire = 0; laneWire <= NUMLANES; laneWire++) {
 			lanepos = HEADERHEIGHT + laneWire * GAMESCREEN/NUMLANES + GAMESCREEN/(NUMLANES * 2)
 			         - LANEHEIGHT / 2;
-         wire = new Lane(lanepos, Math.floor(Math.random() * LANEHEIGHT));
+         wire = new Lane(lanepos);
 			game.rootScene.addChild(wire);
 		}
 		
