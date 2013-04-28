@@ -33,7 +33,7 @@ var SCOREX = 300;
 var RIGHT = 1;
 var LEFT = -1;
 
-var NUM_COLORS = 3;
+var NUM_COLORS = 4;
 
 var DEFAULT_SPEED = 8;
 var MAX_SPEED = 16;
