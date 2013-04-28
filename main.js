@@ -323,7 +323,14 @@ Triangle = Class.create(Sprite, {
 });
 
 //Begin game code
-window.onload = function() {
+runGame = function(isMobile) {
+    if (isMobile)
+    {
+        STG_WIDTH = 1600;
+        STG_HEIGHT = 720;
+        scoreLabel.text = "Mobile Device Detected!";
+        NUMLANES = 4;
+    }
     game = new Game(STG_WIDTH, STG_HEIGHT);
     //Preload images
     //Any resources not preloaded will not appear
