@@ -236,7 +236,7 @@ Triangle = Class.create(Sprite, {
     initialize: function(id, laneNum, x, direction) {
          Sprite.call(this, triWidth, triHeight);
          this.image = game.assets['tri1.png'];
-         this.explosion = game.assets['explosion.mp3'];
+         this.explosion = game.assets['failBuzzer.wav'];
          this.chime = game.assets['chime' + id + '.wav'];
 		 this.scale(direction, 1);
          this.x = x;
@@ -330,14 +330,13 @@ window.onload = function() {
 
     game.preload('tri1.png', 'lane.png', 'bg.png', 'chime1.wav', 
         'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
-        'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png', 'bgmusic.mp3');
+        'chime0.wav', 'chime2.wav', 'chime3.wav', 'failBuzzer.wav', 'gameOver.wav', 'wall.png', 'bgmusic.mp3');
     game.fps = FRAME_RATE;
 
     game.onload = function() { //Prepares the game
         //01 Add Background
         bg = new Sprite(STG_WIDTH, STG_HEIGHT);
         bgMusic.play();
-        game.assets['bgmusic.mp3'].play(-1);
         bg.image = game.assets['bg.png'];
         game.rootScene.addChild(bg);
         
@@ -379,6 +378,8 @@ window.onload = function() {
          startY = Math.floor(Math.random() * NUMLANES);
 
          if (health <= 0) {
+            bgMusic.mute();
+            game.assets['gameOver.wav'].play();
             game.end();
          }
 
