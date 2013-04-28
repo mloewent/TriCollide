@@ -7,11 +7,11 @@ var triHeight = 125;
 
 var BOMB_WIDTH = 100; 
 var BOMB_HEIGHT = 100;
-var BOMB_COOLDOWN = 15; //in seconds
+var BOMB_COOLDOWN = 10; //in seconds
 
 var WALL_WIDTH = 150; 
 var WALL_HEIGHT = 100;
-var WALL_COOLDOWN = 7; //in seconds
+var WALL_COOLDOWN = 5; //in seconds
 
 var EXPLOSION_WIDTH = 125;
 var EXPLOSION_HEIGHT = 125;
@@ -36,8 +36,10 @@ var LEFT = -1;
 var NUM_COLORS = 3;
 
 var DEFAULT_SPEED = 8;
+var MAX_SPEED = 16;
+var SPEED_RATE_INCR = .015;
 var SPAWN_RATE = 2;
-var SPAWN_RATE_INCR = 1.05;
+var SPAWN_RATE_INCR = .03;
 var FRAME_RATE = 30
 //------------------
 //Global vars
@@ -93,7 +95,7 @@ Wall = Class.create(Sprite, {
 				if (time % 3 === 0) {
 					chime.play();
 				}
-                if (time % FRAME_RATE) {
+                if (time % FRAME_RATE === 0) {
                     if (health < 10) {
                         health++;
                     }
@@ -181,7 +183,7 @@ Bomb = Class.create(Sprite, {
     onenterframe: function() {
 		if (this.x < (-1 * this.width) || this.x > (STG_WIDTH + this.width)) {
 			game.rootScene.removeChild(this);
-            wallList.remove(curTriIdx);
+            wallList.remove(wallList.indexOf(this));
         }
         this.x += this.direction * this.speed;
         var id = -1;
@@ -214,7 +216,18 @@ Bomb = Class.create(Sprite, {
             powerupList.remove(powerupList.indexOf(this));
         }
         
-    }
+    },
+
+	ontouchmove: function(e) {
+		
+		// Checks if triangle is in gamescreen
+		if (e.y >= HEADERHEIGHT && e.y <= STG_HEIGHT - FOOTERHEIGHT) {
+			//snap on
+			var lane = Math.floor((e.y - HEADERHEIGHT)/(GAMESCREEN/NUMLANES));
+			this.y = HEADERHEIGHT + lane * GAMESCREEN/NUMLANES 
+			         + GAMESCREEN/(NUMLANES * 2) - this.image.height / 2;
+		}
+	}
 
 });
 
@@ -315,7 +328,7 @@ window.onload = function() {
     //Preload images
     //Any resources not preloaded will not appear
 
-    game.preload('tri1.png', 'lane.png', 'diamond-sheet.png', 'bg.png', 'chime1.wav', 
+    game.preload('tri1.png', 'lane.png', 'bg.png', 'chime1.wav', 
         'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
         'chime0.wav', 'chime2.wav', 'explosion.mp3', 'wall.png', 'bgmusic.mp3');
     game.fps = FRAME_RATE;
@@ -410,8 +423,8 @@ window.onload = function() {
                     tri = new Triangle(Math.floor(Math.random() * NUM_COLORS), startY, startX, dir);
                     triangleList.push(tri);
                     game.rootScene.addChild(tri);
-                    triSpawnTimer = 0;
                 }
+                triSpawnTimer = 0;
 			}
             
             if (time % (FRAME_RATE * BOMB_COOLDOWN)  === 0) {
@@ -441,7 +454,10 @@ window.onload = function() {
                 game.rootScene.addChild(wall);
             }
             if (time % FRAME_RATE === 0)
-               SPAWN_RATE = SPAWN_RATE * SPAWN_RATE_INCR;
+               SPAWN_RATE += SPAWN_RATE_INCR;
+               if (DEFAULT_SPEED < MAX_SPEED) {
+                  DEFAULT_SPEED += SPEED_RATE_INCR;
+               }
         });
 
     }
