@@ -87,6 +87,7 @@ Wall = Class.create(Sprite, {
 	   this.speed = DEFAULT_SPEED;
        this.scaleX = direction;
 	   this.direction = direction;
+	   this.lane = laneNum;
     },
 
     onenterframe: function() {
@@ -414,57 +415,9 @@ runGame = function(isMobile) {
             healthMask.y = 10;
             healthUpdate = health;
          }*/
-			if (triSpawnTimer > 1 / SPAWN_RATE) {
-				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
-				
-                var laneSpaceExists = true;
-                for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
-                   // If they're not in the same lane
-                   if (startY !== triangleList[triangleNdx].lane)
-                      continue;
-
-                   if (dir === RIGHT) {
-                      if (triangleList[triangleNdx].direction === LEFT
-                          && triangleList[triangleNdx].x < STG_WIDTH/ 3) {
-                         laneSpaceExists = false; break;
-                      }
-                   } else {
-                      if (triangleList[triangleNdx].direction === RIGHT 
-                          && triangleList[triangleNdx].x > STG_WIDTH * 2 / 3) {
-                         laneSpaceExists = false; break;
-
-                      }
-                   }
-                }
-
-                if (laneSpaceExists) {
-                    startX = dir === RIGHT ? -triWidth: STG_WIDTH;
-                    tri = new Triangle(Math.floor(Math.random() * NUM_COLORS), startY, startX, dir);
-                    triangleList.push(tri);
-                    game.rootScene.addChild(tri);
-                }
-                triSpawnTimer = 0;
-			}
-            
-            if (time % (FRAME_RATE * BOMB_COOLDOWN)  === 0) {
-				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
-				startY = Math.floor(Math.random() * NUMLANES);
-				startX = dir === RIGHT ? -BOMB_WIDTH: STG_WIDTH;
-    
-                var bomb = new Bomb(startY, startX, dir);
-                powerupList.push(bomb);
-                game.rootScene.addChild(bomb);
-            }
-			
-			
-			if (time % 3 === 0) {
-               score++;
-            }
-
-			scoreLabel.text = "Score : " + score;
-			
+		if (triSpawnTimer > 1 / SPAWN_RATE) {
 			dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
-		    startY = Math.floor(Math.random() * NUMLANES);
+			
 			var laneSpaceExists = true;
 			for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
 			   // If they're not in the same lane
@@ -484,13 +437,88 @@ runGame = function(isMobile) {
 				  }
 			   }
 			}
-            if (laneSpaceExists && time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
-				startX = dir === RIGHT ? -WALL_WIDTH: STG_WIDTH;
+
+		   for (var wallNdx = 0; wallNdx < wallList.length; wallNdx++) {
+			   // If they're not in the same lane
+			   if (startY !== wallList[wallNdx].lane)
+				  continue;
+
+			   if (dir === RIGHT) {
+				  if (wallList[wallNdx].direction === LEFT
+					  && wallList[wallNdx].x < STG_WIDTH/ 3) {
+					 laneSpaceExists = false; 
+					 console.log("Don't spawn!");
+					 break;
+				  }
+			   } else {
+				  if (wallList[wallNdx].direction === RIGHT 
+					  && wallList[wallNdx].x > STG_WIDTH * 2 / 3) {
+					 laneSpaceExists = false;
+					 console.log("Don't spawn!")
+					  break;
+
+				  }
+			   }
+			}
+			
+			if (laneSpaceExists) {
+				startX = dir === RIGHT ? -triWidth: STG_WIDTH;
+				tri = new Triangle(Math.floor(Math.random() * NUM_COLORS), startY, startX, dir);
+				triangleList.push(tri);
+				game.rootScene.addChild(tri);
+			}
+			triSpawnTimer = 0;
+		}
+            
+            if (time % (FRAME_RATE * BOMB_COOLDOWN)  === 0) {
+				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
+				startY = Math.floor(Math.random() * NUMLANES);
+				startX = dir === RIGHT ? -BOMB_WIDTH: STG_WIDTH;
     
-                var wall = new Wall(startY, startX, dir, Math.floor(Math.random() * NUM_COLORS));
-                wallList.push(wall);
-                game.rootScene.addChild(wall);
+                var bomb = new Bomb(startY, startX, dir);
+                powerupList.push(bomb);
+                game.rootScene.addChild(bomb);
             }
+			
+			
+			if (time % 3 === 0) {
+               score++;
+            }
+
+			scoreLabel.text = "Score : " + score;
+			
+			if (time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
+				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
+				startY = Math.floor(Math.random() * NUMLANES);
+				var laneSpaceExists = true;
+				for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+				   // If they're not in the same lane
+				   if (startY !== triangleList[triangleNdx].lane)
+					  continue;
+
+				   if (dir === RIGHT) {
+					  if (triangleList[triangleNdx].direction === LEFT
+						  && triangleList[triangleNdx].x < STG_WIDTH/ 3) {
+						 laneSpaceExists = false; break;
+					  }
+				   } else {
+					  if (triangleList[triangleNdx].direction === RIGHT 
+						  && triangleList[triangleNdx].x > STG_WIDTH * 2 / 3) {
+						 laneSpaceExists = false; break;
+
+					  }
+				   }
+				}
+				if (laneSpaceExists) {
+					startX = dir === RIGHT ? -WALL_WIDTH: STG_WIDTH;
+		
+					var wall = new Wall(startY, startX, dir, Math.floor(Math.random() * NUM_COLORS));
+					wallList.push(wall);
+					game.rootScene.addChild(wall);
+				}
+		    }
+			
+            
             if (time % FRAME_RATE === 0)
                SPAWN_RATE += SPAWN_RATE_INCR;
                if (DEFAULT_SPEED < MAX_SPEED) {
