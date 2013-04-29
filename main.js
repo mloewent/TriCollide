@@ -55,6 +55,8 @@ var triSpawnTimer = 0;
 var frameTime = 1 / FRAME_RATE;
 var score = 0;
 var scoreLabel = new Label("Score : " + score);
+var triangleFileName = 'tri1.png';
+var powerupFileName = 'powerup.png';
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from, to) {
@@ -170,7 +172,7 @@ Effect = Class.create(Sprite, {
 Bomb = Class.create(Sprite, {
     initialize: function(laneNum, x, direction) {
        Sprite.call(this, BOMB_HEIGHT, BOMB_WIDTH);
-       this.image = game.assets['powerup.png'];
+       this.image = game.assets[powerupFileName];
        //this.frame = 0;
 	   this.scale(direction, 1);
        this.x = x;
@@ -235,7 +237,7 @@ Bomb = Class.create(Sprite, {
 Triangle = Class.create(Sprite, {
     initialize: function(id, laneNum, x, direction) {
          Sprite.call(this, triWidth, triHeight);
-         this.image = game.assets['tri1.png'];
+         this.image = game.assets[triangleFileName];
          this.explosion = game.assets['failBuzzer.wav'];
          this.chime = game.assets['chime' + id + '.wav'];
 		 this.scale(direction, 1);
@@ -329,14 +331,23 @@ runGame = function(isMobile) {
         STG_WIDTH = 1600;
         STG_HEIGHT = 720;
         scoreLabel.text = "Mobile Device Detected!";
-        NUMLANES = 4;
+        NUMLANES = 3;
+		NUM_COLORS = 3;
+		triWidth = 175;
+		triHeight = 175;
+
+		BOMB_WIDTH = 175; 
+		BOMB_HEIGHT = 175;
+		
+		triangleFileName = 'tri1mobile.png';
+		powerupFileName = 'powerupmobile.png';
     }
     game = new Game(STG_WIDTH, STG_HEIGHT);
     //Preload images
     //Any resources not preloaded will not appear
 
-    game.preload('tri1.png', 'lane.png', 'bg.png', 'chime1.wav', 
-        'powerup.png', 'exlposions.png', 'healthBar.png', 'healthMask.png', 
+    game.preload(triangleFileName, 'lane.png', 'bg.png', 'chime1.wav', 
+        powerupFileName, 'exlposions.png', 'healthBar.png', 'healthMask.png', 
         'chime0.wav', 'chime2.wav', 'chime3.wav', 'failBuzzer.wav', 'gameOver.wav', 'wall.png', 'bgmusic.mp3');
     game.fps = FRAME_RATE;
 
@@ -452,13 +463,32 @@ runGame = function(isMobile) {
 
 			scoreLabel.text = "Score : " + score;
 			
-            if (time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
-				dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
-				startY = Math.floor(Math.random() * NUMLANES);
+			dir = Math.floor(Math.random() +  .5) ? LEFT : RIGHT;
+		    startY = Math.floor(Math.random() * NUMLANES);
+			var laneSpaceExists = true;
+			for (var triangleNdx = 0; triangleNdx < triangleList.length; triangleNdx++) {
+			   // If they're not in the same lane
+			   if (startY !== triangleList[triangleNdx].lane)
+				  continue;
+
+			   if (dir === RIGHT) {
+				  if (triangleList[triangleNdx].direction === LEFT
+					  && triangleList[triangleNdx].x < STG_WIDTH/ 3) {
+					 laneSpaceExists = false; break;
+				  }
+			   } else {
+				  if (triangleList[triangleNdx].direction === RIGHT 
+					  && triangleList[triangleNdx].x > STG_WIDTH * 2 / 3) {
+					 laneSpaceExists = false; break;
+
+				  }
+			   }
+			}
+            if (laneSpaceExists && time % (FRAME_RATE * WALL_COOLDOWN)  === 0) {
 				startX = dir === RIGHT ? -WALL_WIDTH: STG_WIDTH;
     
                 var wall = new Wall(startY, startX, dir, Math.floor(Math.random() * NUM_COLORS));
-                wallList.push(bomb);
+                wallList.push(wall);
                 game.rootScene.addChild(wall);
             }
             if (time % FRAME_RATE === 0)
